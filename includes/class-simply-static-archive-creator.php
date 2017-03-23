@@ -248,7 +248,7 @@ class Simply_Static_Archive_Creator {
 		$recursive_iterator = new RecursiveIteratorIterator( $directory_iterator, RecursiveIteratorIterator::SELF_FIRST );
 
 		S3::$useExceptions = true;
-		$s3 = new S3( $aws_access_key_id, $aws_secret_access_key, false, 's3-eu-west-1.amazonaws.com' );
+		$s3 = new S3( $aws_access_key_id, $aws_secret_access_key, false, 's3.amazonaws.com' );
 
 		foreach ( $recursive_iterator as $item ) {
 			if (!$item->isDir()) {
