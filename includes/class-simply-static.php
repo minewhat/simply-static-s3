@@ -243,7 +243,7 @@ class Simply_Static {
 	 * @return void
 	 */
 	public function publish_to_s3_button(){
-		if ( 'publish' !== get_post_status() ) return;
+		if ( 'publish' !== get_post_status() || $this->check_system_requirements() ) return;
 		$url = get_permalink();
 		?>
         <div style="overflow:hidden; margin-bottom:10px; margin-right:10px;">
