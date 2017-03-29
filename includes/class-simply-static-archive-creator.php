@@ -57,16 +57,24 @@ class Simply_Static_Archive_Creator {
 	protected $additional_urls;
 
 	/**
+	 * Are we only saving a single page
+	 *
+	 * @var bool
+	 */
+	protected $single_page;
+
+	/**
 	 * Constructor
 	 *
 	 * @param string $url URI resource
 	 */
-	public function __construct( $slug, $destination_scheme, $destination_host, $temp_files_dir, $additional_urls ) {
+	public function __construct( $slug, $destination_scheme, $destination_host, $temp_files_dir, $additional_urls, $single_page ) {
 		$this->slug = $slug;
 		$this->destination_scheme = $destination_scheme;
 		$this->destination_host = $destination_host;
 		$this->temp_files_dir = $temp_files_dir;
 		$this->additional_urls = $additional_urls;
+		$this->single_page = $single_page;
 	}
 
 	/**
@@ -106,6 +114,10 @@ class Simply_Static_Archive_Creator {
 			// see: http://stackoverflow.com/questions/1483497/how-to-put-string-in-array-split-by-new-line
 			preg_split( "/\r\n|\n|\r/", $this->additional_urls )
 		) );
+
+		if ( true === $this->single_page ) {
+			$urls_queue = array( trailingslashit( $this->additional_urls ) );
+		}
 
 		while ( count( $urls_queue ) ) {
 			$current_url = array_shift( $urls_queue );

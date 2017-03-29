@@ -53,6 +53,27 @@ select:disabled, select.disabled {
     color: #737373;
 }
 
+#post-type-select{
+	margin-bottom: 15px;
+}
+
+#post-type-select h4{
+	margin-bottom: 5px;
+}
+
+#post-type-select span{
+	margin-right: 10px;
+}
+
+#post-type-select span button{
+	cursor: pointer;
+}
+
+#post-type-select span button.clicked{
+	color: #adadad;
+    cursor: initial;
+}
+
 /* Mailchimp Form CSS */
 
 /* Mailchimp original CSS at:
@@ -62,3 +83,5 @@ select:disabled, select.disabled {
 #mc_embed_signup input:focus {border-color:#333;}
 #mc_embed_signup .clear {clear:none; display:inline;}
 #mc_embed_signup input.email {display:block; padding:8px 0; margin:0 4% 10px 0; text-indent:5px; width:58%; min-width:130px; width:100%;}
+
+

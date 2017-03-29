@@ -84,6 +84,13 @@ class Simply_Static {
 			add_action( 'admin_enqueue_scripts', array( self::$instance, 'enqueue_admin_scripts' ) );
 			// Add the options page and menu item.
 			add_action( 'admin_menu', array( self::$instance, 'add_plugin_admin_menu' ), 2 );
+			// Add ajax function to generate single page
+			add_action( 'wp_ajax_ss_generate_single_page', array( self::$instance, 'ss_generate_single_page_function' ) );
+			// Add custom button
+			add_action( 'post_submitbox_misc_actions', array( self::$instance, 'publish_to_s3_button' ) );
+			// Add ajax function to get posts by post type
+			add_action( 'wp_ajax_ss_get_post_type_entries', array( self::$instance, 'ss_get_post_type_entries_function' ) );
+
 		}
 
 		return self::$instance;
@@ -202,6 +209,86 @@ class Simply_Static {
 		);
 	}
 
+	public function ss_get_post_type_entries_function() {
+		if ( isset( $_POST['post_type'] ) ) {
+			$args = array(
+					'post_type' => $_POST['post_type'],
+					'post_status' => 'publish',
+					'posts_per_page' => -1
+				);
+
+			$the_posts = get_posts( $args );
+
+			$l_arr = array();
+
+			foreach ($the_posts as $the_post) {
+				$link = get_permalink( $the_post->ID );
+				if ( home_url() . '/' !== $link ){
+					$l .= $link . ",";
+					$l_arr[] = $link;
+				}
+			}
+
+			$new_arr = array_filter( array_unique( array_merge( $l_arr, explode( ',', $_POST['curr_urls'] ) ) ) );
+
+			echo implode( "\n", $new_arr );
+
+			wp_die();
+		}
+	}
+
+	/**
+	 * Generate button for publishing page to S3.
+	 *
+	 * @return void
+	 */
+	public function publish_to_s3_button(){
+		if ( 'publish' !== get_post_status() ) return;
+		$url = get_permalink();
+		?>
+        <div style="overflow:hidden; margin-bottom:10px; margin-right:10px;">
+	        <div id="publishing-action">
+	        	<input type="submit" data-url="<?php echo esc_url( $url ); ?>" accesskey="p" tabindex="5" value="Publish to S3 Bucket" class="button-primary" id="publish-to-s3">
+	        </div>
+        </div>
+
+
+        <?php
+	}
+
+	/**
+	 * Generate a single static page.
+	 *
+	 * @return void
+	 */
+	public function ss_generate_single_page_function() {
+		if ( isset( $_POST['url'] ) ) {
+			$archive_creator = new Simply_Static_Archive_Creator(
+				self::SLUG,
+				$this->options->get( 'destination_scheme' ),
+				$this->options->get( 'destination_host' ),
+				$this->options->get( 'temp_files_dir' ),
+				$_POST['url'],
+				true
+			);
+			$archive_creator->create_archive();
+
+			$bucket = $this->options->get( 'aws_s3_bucket' );
+			$result = $archive_creator->publish_to_s3(
+				$bucket,
+				$this->options->get( 'aws_access_key_id' ),
+				$this->options->get( 'aws_secret_access_key' )
+			);
+			if ( is_wp_error( $result ) ) {
+				$error = $result->get_error_message();
+				wp_die( $error );
+			} else {
+				$message = __( 'Site published to S3 bucket: ' . $bucket, self::SLUG );
+				wp_die( $message );
+			}
+		}
+	}
+
 	/**
 	 * Render the page for generating a static site.
 	 *
@@ -218,7 +305,8 @@ class Simply_Static {
 				$this->options->get( 'destination_scheme' ),
 				$this->options->get( 'destination_host' ),
 				$this->options->get( 'temp_files_dir' ),
-				$this->options->get( 'additional_urls' )
+				$this->options->get( 'additional_urls' ),
+				false
 			);
 			$archive_creator->create_archive();
 
