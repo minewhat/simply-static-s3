@@ -85,4 +85,10 @@ jQuery( document ).ready( function($) {
         }
     });
 
+    $( '#basicAuthCredentialsSaved > a' ).click( function(e) {
+        e.preventDefault();
+        $( '#basicAuthSet' ).addClass( 'hide' );
+        $( '#basicAuthUserPass').removeClass( 'hide' ).find( 'input' ).prop( 'disabled', false );
+    });
+
 });

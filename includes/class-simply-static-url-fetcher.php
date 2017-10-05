@@ -20,6 +20,9 @@ class Simply_Static_Url_Fetcher {
 	 * @return WP_Error|Simply_Static_Url_Response
 	 */
 	public static function fetch( $url ) {
+		
+
+		$basic_auth_digest = get_option( 'http_basic_auth_digest' );
 		// Don't process URLs that don't match the URL of this WordPress installation
 		if ( ! sist_is_local_url( $url ) ) {
 			return new WP_Error( 'attempting_to_fetch_remote_url', sprintf( __( "Attempting to fetch remote URL: %s", Simply_Static::SLUG ), $url ) );
@@ -30,6 +33,10 @@ class Simply_Static_Url_Fetcher {
 			'sslverify' => false, // not verifying SSL because all calls are local
 			'redirection' => 0 // disable redirection
 		) );
+
+		if ( $basic_auth_digest ) {
+			$args['headers'] = array( 'Authorization' => 'Basic ' . $basic_auth_digest );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			return $response;

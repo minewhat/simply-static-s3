@@ -125,6 +125,41 @@
 			</div>
 
 			<div id='advanced' class='tab-pane'>
+				<?php if ( $this->http_basic_auth_digest != null ) : ?>
+			<table class='form-table' id='basicAuthSet'>
+				<tbody>
+					<tr>
+						<th>
+							<label><?php _e( "Basic Auth", 'simply-static' ); ?></label>
+						</th>
+						<td>
+							<p id='basicAuthCredentialsSaved'><?php _e( "Your basic auth credentials have been saved. To disable basic auth or set a new username/password, <a href='#'>click here</a>.", 'simply-static' ); ?></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<?php endif; ?>
+			<table class='form-table <?php if ( $this->http_basic_auth_digest != null ) echo 'hide' ?>' id='basicAuthUserPass'>
+				<tbody>
+					<tr>
+						<th>
+							<label for='basicAuthUsername'><?php _e( "Basic Auth Username", 'simply-static' ); ?></label>
+						</th>
+						<td>
+							<input type='text' id='basicAuthUsername' name='basic_auth_username' value='' <?php if ( $this->http_basic_auth_digest != null ) echo 'disabled' ?> />
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for='basicAuthPassword'><?php _e( "Basic Auth Password", 'simply-static' ); ?></label>
+						</th>
+						<td>
+							<input type='text' id='basicAuthPassword' name='basic_auth_password' value='' <?php if ( $this->http_basic_auth_digest != null ) echo 'disabled' ?> />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
 
 				<table class='form-table'>
 					<tbody>
@@ -150,6 +185,9 @@
 								</p>
 							</td>
 						</tr>
+
+						<h2 class="title"><?php _e( "HTTP Basic Authentication", 'simply-static' ); ?></h2>
+			<p><?php _e( "If you've secured WordPress with HTTP Basic Auth you can specify the username and password to use below.", 'simply-static' ); ?></p>			
 						<tr>
 							<th>
 								<label for='additionalUrls'><?php _e( "Additional URLs", $this->slug );?></label>
@@ -195,6 +233,7 @@
 						</tr>
 					</tbody>
 				</table>
+
 
 			</div>
 

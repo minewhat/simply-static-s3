@@ -91,6 +91,9 @@ class Simply_Static {
 			// Add ajax function to get posts by post type
 			add_action( 'wp_ajax_ss_get_post_type_entries', array( self::$instance, 'ss_get_post_type_entries_function' ) );
 
+			// Filters
+			add_filter( 'http_request_args', array( self::$instance, 'wpbp_http_request_args' ), 10, 2 );
+
 		}
 
 		return self::$instance;
@@ -394,6 +397,7 @@ class Simply_Static {
 			->assign( 'aws_s3_bucket', $this->options->get( 'aws_s3_bucket' ) )
 			->assign( 'aws_access_key_id', $this->options->get( 'aws_access_key_id' ) )
 			->assign( 'aws_secret_access_key', $this->options->get( 'aws_secret_access_key' ) )
+			->assign( 'http_basic_auth_digest', $this->options->get( 'http_basic_auth_digest' ) )
 			->render();
 	}
 
@@ -403,6 +407,23 @@ class Simply_Static {
 	 * @return void
 	 */
 	public function save_options() {
+
+		// Set basic auth
+		// Checking $_POST array to see if fields exist. The fields are disabled
+		// if the digest is set, but fetch_post_value() would still return them
+		// as empty strings.
+		if ( isset( $_POST['basic_auth_username'] ) && isset( $_POST['basic_auth_password'] ) ) {
+			$basic_auth_user = trim( $this->fetch_post_value( 'basic_auth_username' ) );
+			$basic_auth_pass = trim( $this->fetch_post_value( 'basic_auth_password' ) );
+
+			if ( $basic_auth_user != '' && $basic_auth_pass != '' ) {
+				$http_basic_auth_digest = base64_encode( $basic_auth_user . ':' . $basic_auth_pass );
+			} else {
+				$http_basic_auth_digest = null;
+			}
+			$this->options->set( 'http_basic_auth_digest', $http_basic_auth_digest );
+		}
+		
 		$this->options
 			->set( 'destination_scheme', filter_input( INPUT_POST, 'destination_scheme' ) )
 			->set( 'destination_host', untrailingslashit( filter_input( INPUT_POST, 'destination_host', FILTER_SANITIZE_URL ) ) )
@@ -493,5 +514,27 @@ class Simply_Static {
 		}
 
 		return $errors;
+	}
+
+	/**
+	 * Set HTTP Basic Auth for wp-background-processing
+	 */
+	function wpbp_http_request_args( $r, $url ) {
+		$digest = self::$instance->options->get( 'http_basic_auth_digest' );
+		if ( $digest ) {
+			$r['headers']['Authorization'] = 'Basic ' . $digest;
+		}
+		return $r;
+	}
+
+	/**
+	 * Fetch a POST variable by name and sanitize it
+	 * @param  string $variable_name Name of the POST variable to fetch
+	 * @return string                Value of the POST variable
+	 */
+	public function fetch_post_value( $variable_name ) {
+		$input = filter_input( INPUT_POST, $variable_name );
+		// using explode/implode to keep linebreaks in text areas
+		return implode( "\n", array_map( 'sanitize_text_field', explode( "\n", $input ) ) );
 	}
 }
