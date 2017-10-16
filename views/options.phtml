@@ -99,7 +99,7 @@
 								<label for='aws_access_key_id'><?php _e( "AWS Access Key ID", $this->slug );?></label>
 							</th>
 							<td>
-								<input aria-describedby='awsAccessKeyIDHelpBlock' type='text' id='awsS3AccessKeyID' name='aws_access_key_id' value='<?php echo esc_attr( $this->aws_access_key_id ) ?>' placeholder='Access Key ID with write access to S3' class='widefat' />
+								<input aria-describedby='awsAccessKeyIDHelpBlock' type='password' id='awsS3AccessKeyID' name='aws_access_key_id' value='<?php echo esc_attr( $this->aws_access_key_id ) ?>' placeholder='Access Key ID with write access to S3' class='widefat' />
 								<p id='awsS3AccessKeyIDHelpBlock' class='help-block'><?php _e( "If you don't have an access key, use AWS Console IAM to generate a new user and access key. It must have rights to publish to S3.", $this->slug ); ?></p>
 							</td>
 						</tr>
@@ -108,7 +108,7 @@
 								<label for='aws_secret_access_key'><?php _e( "AWS Secret Access Key", $this->slug );?></label>
 							</th>
 							<td>
-								<input aria-describedby='awsSecretAccessKeyHelpBlock' type='text' id='awsSecretS3AccessKey' name='aws_secret_access_key' value='<?php echo esc_attr( $this->aws_secret_access_key ) ?>' placeholder='Secret Access Key with write access to S3' class='widefat' />
+								<input aria-describedby='awsSecretAccessKeyHelpBlock' type='password' id='awsSecretS3AccessKey' name='aws_secret_access_key' value='<?php echo esc_attr( $this->aws_secret_access_key ) ?>' placeholder='Secret Access Key with write access to S3' class='widefat' />
 								<p id='awsS3SecretAccessKeyHelpBlock' class='help-block'><?php _e( "If you don't have an access key, use AWS Console IAM to generate a new user and access key. It must have rights to publish to S3.", $this->slug ); ?></p>
 							</td>
 						</tr>
